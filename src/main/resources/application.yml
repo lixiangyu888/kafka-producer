@@ -1,0 +1,68 @@
+
+server:
+  port: 8066
+  tomcat:
+    uri-encoding: UTF-8
+    accesslog:
+      file-date-format: .yyyy-MM-dd
+  servlet:
+    context-path: /
+
+
+spring:
+  kafka:
+    topic-name: kafka-topic
+    bootstrap-servers: localhost:9092 # 192.168.59.222:9092
+    producer:
+      # 必须 bootstrap-servers、key-serializer、value-serializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: -1 # ACK应答级别，指定分区中必须要有多少个副本收到消息之后才会认为消息成功写入，默认为1只要分区的leader副本成功写入消息；0表示不需要等待任何服务端响应；-1或all需要等待ISR中所有副本都成功写入消息
+      retries: 3 # 重试次数
+      batch-size: 16384 #批次大小，默认16k
+      buffer-memory: 33554432 #缓冲区大小，默认32M
+      client-id: kafka.producer.client.id #客户端ID
+      compression-type: none #消息压缩方式，默认为none，另外有gzip、snappy、lz4
+      properties:
+        retry.backoff.ms: 100 #重试时间间隔，默认100
+        linger.ms: 0 #默认为0，表示批量发送消息之前等待更多消息加入batch的时间
+        max.request.size: 1048576 #默认1MB，表示发送消息最大值
+        connections.max.idle.ms: 540000 #默认9分钟，表示多久后关闭限制的连接
+        receive.buffer.bytes: 32768 #默认32KB，表示socket接收消息缓冲区的大小，为-1时使用操作系统默认值
+        send.buffer.bytes: 131072 #默认128KB，表示socket发送消息缓冲区大小，为-1时使用操作系统默认值
+        request.timeout.ms: 30000 #默认30000ms，表示等待请求响应的最长时间
+  datasource:
+    #name: boot
+    url: jdbc:mysql://localhost:3306/company?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: admin
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+  # QQ邮箱配置
+  mail:
+    host: smtp.qq.com
+    #发件人QQ邮箱地址
+    username: 1059712703@qq.com
+    #QQ邮箱授权码
+    password: haztdnoderfzbedb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+#Mybatis配置
+mybatis:
+  type-handlers-package: com.example.kafkaproducer.domain.entity
+  mapper-locations: com.example.kafkaproducer.mapper.*.xml
+
+#API接口文档swagger配置
+# 用于控制是否开启Swagger，生产环境记得关闭Swagger，将值设置为 false
+springfox.:
+  swagger2:
+    enabled: true
